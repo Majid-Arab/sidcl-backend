@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["jsonProtocol"]
+}
+
+datasource db {
+    provider = "postgres"
+    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+    // Further reading:
+    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+    // url = env("postgresql://postgres:bilal1234@@35.72.13.145:5432/sidcl?schema=public") 
+    url      = env("DATABASE_URL")
+}
+
+model user {
+    id                 Int         @id @default(autoincrement())
+    first_name         String      @db.VarChar(150)
+    last_name          String?     @db.VarChar(150)
+    email              String?     @unique @db.VarChar(150)
+    password           String?     @unique @db.VarChar(150)
+    phone              String?     @unique @db.VarChar(150)
+    role_id            Int?
+    roles              role        @default(COMPLAINT_RECORDER)
+    created_at         DateTime    @db.Timestamp(6)
+    updated_at         DateTime    @db.Timestamp(6)
+    deleted_at         DateTime    @db.Timestamp(6)
+    category_id        Int[]
+    assignedComplaints complaint[] @relation("assignedComplaints")
+    recordedComplaints complaint[] @relation("recordedComplaints")
+    complaineeRecords  complaint[] @relation("complaineeRecords")
+    complaint          complaint[]
+}
+
+model complaint {
+    id            Int         @id @default(autoincrement())
+    title         String
+    message       String
+    status        status      @default(OPEN)
+    priority      priority    @default(NORMAL)
+    createdAt     DateTime    @default(now())
+    updatedAt     DateTime    @updatedAt
+    resolvedAt    DateTime?
+    pendingAt     DateTime?
+    user_id       Int?
+    resolver_id   Int?
+    recorder_id   Int?
+    category_id   Int?
+    complainee_id Int?
+    user          user?       @relation(fields: [user_id], references: [id])
+    category      category?   @relation(fields: [category_id], references: [id])
+    resolver      user?       @relation("assignedComplaints", fields: [resolver_id], references: [id])
+    recorder      user?       @relation("recordedComplaints", fields: [recorder_id], references: [id])
+    complainee    user?       @relation("complaineeRecords", fields: [complainee_id], references: [id])
+    complainer    complainer? @relation(fields: [complainerId], references: [id])
+    complainerId  Int?
+}
+
+model category {
+    id         Int         @id @default(autoincrement())
+    name       String      @unique @db.VarChar(100)
+    created_at DateTime?   @db.Timestamptz(6)
+    updated_at DateTime?   @db.Timestamptz(6)
+    deleted_at DateTime?   @db.Timestamptz(6)
+    complaint  complaint[]
+}
+
+model complainer {
+    id         Int         @id @default(autoincrement())
+    first_name String      @db.VarChar(150)
+    last_name  String?     @db.VarChar(150)
+    email      String?     @unique @db.VarChar(150)
+    password   String?     @unique @db.VarChar(150)
+    phone      String?     @unique @db.VarChar(150)
+    complaint  complaint[]
+}
+
+enum status {
+    OPEN
+    IN_PROGRESS
+    RESOLVED
+}
+
+enum priority {
+    NORMAL
+    HIGH
+    URGENT
+}
+
+enum role {
+    ADMIN
+    COMPLAINT_RECORDER
+    COMPLAINT_RESOLVER
+}
