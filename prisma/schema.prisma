@@ -41,22 +41,23 @@ model complaint {
     message       String
     status        status      @default(OPEN)
     priority      priority    @default(NORMAL)
-    createdAt     DateTime    @default(now())
-    updatedAt     DateTime    @updatedAt
-    resolvedAt    DateTime?
-    pendingAt     DateTime?
     user_id       Int?
     resolver_id   Int?
     recorder_id   Int?
     category_id   Int?
     complainee_id Int?
+    complainer_id Int?
+    resolvedAt    DateTime?
+    pendingAt     DateTime?
+    createdAt     DateTime    @default(now())
+    updatedAt     DateTime    @updatedAt
+    deleted_at    DateTime    @db.Timestamp(6)
     user          user?       @relation(fields: [user_id], references: [id])
     category      category?   @relation(fields: [category_id], references: [id])
     resolver      user?       @relation("assignedComplaints", fields: [resolver_id], references: [id])
     recorder      user?       @relation("recordedComplaints", fields: [recorder_id], references: [id])
     complainee    user?       @relation("complaineeRecords", fields: [complainee_id], references: [id])
-    complainer    complainer? @relation(fields: [complainerId], references: [id])
-    complainerId  Int?
+    complainer    complainer? @relation(fields: [complainer_id], references: [id])
 }
 
 model category {
