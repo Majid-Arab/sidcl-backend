@@ -8,16 +8,8 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Card, Grid, Title as Heading} from '@mantine/core';
 import { Bar } from 'react-chartjs-2';
 import { faker } from '@faker-js/faker';
-import BarChart from '../../components/BarChart';
-import DoughnutChart from '../../components/DoghnutChart';
-import PieChart from '../../components/PieChart';
-import RadarChart from '../../components/RadarChart';
-import PolarChart from '../../components/PolarChart';
-import LineChart from '../../components/LineChart';
-
 
 ChartJS.register(
   CategoryScale,
@@ -69,18 +61,6 @@ export const data = {
   ],
 };
 
-export default function Dashboard() {
-  return <>
-   <Heading>Dashboard</Heading>
-    <Grid>
-      <Card w={'25%'} m={5}><PieChart/></Card>
-      <Card w={'45%'} m={5}><BarChart/></Card>
-      <Card w={'25%'} m={5}><RadarChart/></Card>
-    </Grid>
-    <Grid>
-      <Card w={'25%'} m={5}><DoughnutChart/></Card>
-      <Card w={'45%'} m={5}><LineChart/></Card>
-      <Card w={'25%'} m={5}><PolarChart/></Card>
-    </Grid>
-  </>;
+export default function BarChart() {
+  return <Bar options={options} data={data}/>;
 }
